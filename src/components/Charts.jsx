@@ -53,7 +53,7 @@ export default function Charts({ leads, dark, onlyStatus = false }) {
   const statusCard = (
     <section className="glass-strong min-w-0 rounded-2xl p-5 border border-slate-200/70 dark:border-white/10 flex flex-col justify-between">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3">
+      <div className="flex items-center justify-between pb-2">
         <div>
           <h2 className="text-sm font-bold text-slate-900 dark:text-white">
             Pipeline Overview
@@ -70,58 +70,61 @@ export default function Charts({ leads, dark, onlyStatus = false }) {
       {!totalLeads ? (
         <ChartEmpty />
       ) : (
-        <div className="space-y-4 py-1">
-          {/* Multi-Segment Distribution Track */}
-          <div className="space-y-1.5">
-            <div className="flex h-3 w-full overflow-hidden rounded-full bg-slate-100 p-0.5 dark:bg-slate-800/80 gap-0.5">
-              {stageConfig.map((stage, idx) => {
-                const count = counts[idx] || 0;
-                if (!count) return null;
-                const pct = ((count / totalLeads) * 100).toFixed(1);
-                return (
-                  <div
-                    key={stage.name}
-                    title={`${stage.name}: ${count} (${pct}%)`}
-                    style={{ width: `${(count / totalLeads) * 100}%` }}
-                    className={`h-full first:rounded-l-full last:rounded-r-full ${stage.bg} transition-all duration-300 hover:opacity-90 cursor-pointer`}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Stage Progress Rows */}
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            {stageConfig.map((stage, idx) => {
-              const count = counts[idx] || 0;
-              const pct = totalLeads ? Math.round((count / totalLeads) * 100) : 0;
-              return (
-                <div
-                  key={stage.name}
-                  className="flex flex-col p-2 rounded-xl bg-slate-50/70 dark:bg-slate-800/30 border border-slate-200/50 dark:border-white/5 hover:bg-white dark:hover:bg-slate-800/60 transition-all duration-150"
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className={`h-2 w-2 rounded-full ${stage.bg} shrink-0`} />
-                      <span className="truncate text-xs font-medium text-slate-700 dark:text-slate-300">
-                        {stage.name}
-                      </span>
-                    </div>
-                    <span className="font-semibold text-slate-900 dark:text-white tabular-nums">
-                      {count} <span className="text-[10px] font-normal text-slate-400">({pct}%)</span>
-                    </span>
-                  </div>
-                  {/* Mini Progress bar */}
-                  <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-700/50">
-                    <div
-                      className={`h-full rounded-full ${stage.bg} transition-all duration-300`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <div className="mt-2.5 h-[165px] sm:h-[175px]">
+          <Bar
+            aria-label="Lead count by stage"
+            role="img"
+            data={{
+              labels: STATUSES,
+              datasets: [
+                {
+                  label: 'Leads',
+                  data: counts,
+                  backgroundColor: [
+                    '#3b82f6',
+                    '#06b6d4',
+                    '#8b5cf6',
+                    '#f59e0b',
+                    '#10b981',
+                    '#f43f5e',
+                  ],
+                  borderRadius: 6,
+                  maxBarThickness: 26,
+                },
+              ],
+            }}
+            options={{
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: dark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.98)',
+                  titleColor: dark ? '#f8fafc' : '#0f172a',
+                  bodyColor: dark ? '#cbd5e1' : '#334155',
+                  borderColor: dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(148, 163, 184, 0.3)',
+                  borderWidth: 1,
+                  padding: 8,
+                  cornerRadius: 8,
+                  callbacks: {
+                    label: (ctx) => ` ${ctx.raw} leads (${totalLeads ? ((ctx.raw / totalLeads) * 100).toFixed(0) : 0}%)`,
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: { color: textColor, font: { size: 10, weight: '500' } },
+                  grid: { display: false },
+                  border: { display: false },
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: { color: textColor, precision: 0, font: { size: 10 } },
+                  grid: { color: gridColor },
+                  border: { display: false },
+                },
+              },
+            }}
+          />
         </div>
       )}
     </section>
